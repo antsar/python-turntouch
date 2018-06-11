@@ -49,14 +49,14 @@ tt.name = 'Living Room Remote'
 ## Listening for button presses
 
 ```python
-from turntouch import TurnTouch, DefaultButtonPressHandler
+from turntouch import TurnTouch, DefaultActionHandler
 
-class MyHandler(DefaultButtonPressHandler):
-    def button_north(self):
+class MyHandler(DefaultActionHandler):
+    def action_north(self):
         print("Up button pressed.")
-    def button_east_double_tap(self):
+    def action_east_double_tap(self):
         print("Right button double-tapped.")
-    def button_south_hold(self):
+    def action_south_hold(self):
         print("Down button held.")
 
 tt = TurnTouch('c0:ff:ee:c0:ff:ee')
@@ -75,7 +75,7 @@ Here's a more complex example, triggering some existing functions.
 import turntouch
 
 # Define a handler
-class MyFancyHandler(turntouch.DefaultButtonPressHandler):
+class MyFancyHandler(turntouch.DefaultActionHandler):
 
     def __init__(some_object, other_function):
         """Use the __init__ method to pass references to parts of your code,
@@ -83,18 +83,18 @@ class MyFancyHandler(turntouch.DefaultButtonPressHandler):
         self.thing_1 = some_object
         self.other_func = other_function
 
-    def button_any(press_type):
-        """Special handler which is fired for ALL button presses.
-        `press_type` is an instance of turntouch.PressType."""
-        if press_type.name == "North":
+    def action_any(action):
+        """Special handler which is fired for ALL actions.
+        `action` is an instance of turntouch.Action."""
+        if action.name == "North":
             self.thing_1.some_method()
-        elif press_type.name in ["South", "East", "West"]:
+        elif action.name in ["South", "East", "West"]:
             self.thing_1.other_method()
         else:
             self.other_func()
 
-    def button_south_hold():
-        print("You can combine per-button handlers with button_any!")
+    def action_south_hold():
+        print("You can combine per-button handlers with action_any!")
 
 
 # Instantiate the handler, passing some application data into it
@@ -118,7 +118,7 @@ If you don't want the listener to run forever, do this:
 
 ```python
 tt = TurnTouch('c0:ff:ee:c0:ff:ee', handler=SomeHandler)
-tt.listen()  # Will return as soon as one button is pressed.
+tt.listen()  # Will return as soon as one action occurs.
 ```
 
 ## Error handling
