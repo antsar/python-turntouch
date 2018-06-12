@@ -283,6 +283,15 @@ class TurnTouch(btle.Peripheral):
         logger.debug("Set name for device {address} to '{name}'".format(
             address=self.addr, name=name_bytes))
 
+    @property
+    def battery(self) -> int:
+        """Read the battery level (percentage) of this remote."""
+        battery_bytes = self.getCharacteristics(
+            uuid=self.BATTERY_LEVEL_CHARACTERISTIC_UUID)[0].read()
+        logger.debug("Read device {address} battery level: '{battery}'".format(
+            address=self.addr, battery=battery_bytes))
+        return int.from_bytes(battery_bytes, byteorder='big')
+
     def listen_forever(self):
         """Listen for button press events indefinitely."""
         self.listen(only_one=False)

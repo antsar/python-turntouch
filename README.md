@@ -39,8 +39,8 @@ import turntouch
 # Connect to a device by MAC address
 tt = turntouch.TurnTouch('c0:ff:ee:c0:ff:ee')
 
-# Read the device nickname
-print(tt.name)
+# Read the device nickname and battery percentage
+print("Name: {}\nBattery: {}".format(tt.name, tt.battery))
 
 # Update the device nickname (max. 32 characters)
 tt.name = 'Living Room Remote'
