@@ -73,6 +73,8 @@ tt.listen_forever()
 TurnTouch('c0:ff:ee:c0:ff:ee', handler=MyHandler(), listen=True)
 ```
 
+See the **Actions** section for a full list of actions.
+
 ## More advanced usage
 
 Here's a more complex example, triggering some existing functions.
@@ -131,3 +133,31 @@ tt.listen()  # Will return as soon as one action occurs.
 
 Connection failures will raise `turntouch.TurnTouchException`. You may want to
 catch and ignore this exception to retry connecting.
+
+## Actions
+
+- `action_any`
+- `action_off`
+- `action_north`
+- `action_north_double_tap`
+- `action_north_hold`
+- `action_east`
+- `action_east_double_tap`
+- `action_east_hold`
+- `action_west`
+- `action_west_double_tap`
+- `action_west_hold`
+- `action_south`
+- `action_south_double_tap`
+- `action_south_hold`
+- `action_multi_north_east`
+- `action_multi_north_west`
+- `action_multi_north_south`
+- `action_multi_east_west`
+- `action_multi_east_south`
+- `action_multi_west_south`
+- `action_multi_north_east_west`
+- `action_multi_north_east_south`
+- `action_multi_north_west_south`
+- `action_multi_east_west_south`
+- `action_multi_north_east_west_south`
