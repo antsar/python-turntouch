@@ -9,7 +9,7 @@ def read(filename):
 
 setup(
     name='TurnTouch',
-    version='0.1',
+    version='0.2',
     url='https://github.com/antsar/python-turntouch',
     author='Anton Sarukhanov',
     author_email='code@ant.sr',
@@ -22,7 +22,7 @@ setup(
         'bluepy==1.1.4',
     ],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',
