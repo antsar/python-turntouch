@@ -60,7 +60,7 @@ class MyHandler(DefaultActionHandler):
         print("Down button held.")
 
 tt = TurnTouch('c0:ff:ee:c0:ff:ee')
-tt.set_handler(MyHandler())
+tt.handler = MyHandler()
 tt.listen_forever()
 
 # One-liner alternative (same as listen_forever)
@@ -107,7 +107,7 @@ while not devices:
 tt = devices[0]
 
 # Assign the handler to your device.
-tt.set_handler(my_handler)
+tt.handler = my_handler
 
 tt.listen_forever()
 ```
