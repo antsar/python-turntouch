@@ -257,6 +257,7 @@ class TurnTouch(btle.Peripheral):
                                      .format(address=address))
         self.withDelegate(self.NotificationDelegate(turn_touch=self))
         self.handler = handler or DefaultActionHandler
+        self.debounce = debounce
         self._combo_action = set()
         if listen:
             self.listen_forever()
