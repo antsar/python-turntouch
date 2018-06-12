@@ -7,6 +7,12 @@ It is written in Python 3, originally for use with [Home Assistant](https://www.
 
 # Usage
 
+Install this library from PyPI:
+
+```
+pip install TurnTouch
+```
+
 ## Scanning for Turn Touch devices
 
 **Note:** Scanning requires root privileges on Linux. To avoid this, skip
