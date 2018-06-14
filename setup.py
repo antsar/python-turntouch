@@ -9,7 +9,7 @@ def read(filename):
 
 setup(
     name='TurnTouch',
-    version='0.4',
+    version='0.4.1',
     url='https://github.com/antsar/python-turntouch',
     author='Anton Sarukhanov',
     author_email='code@ant.sr',

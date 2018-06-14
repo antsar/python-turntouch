@@ -327,16 +327,22 @@ class TurnTouch(btle.Peripheral):
 
     def _enable_notifications(self, enabled=True):
         """Tell the remote to start sending button press notifications."""
-        notification_handle = self.getCharacteristics(
-            uuid=self.BUTTON_STATUS_CHARACTERISTIC_UUID)[0].getHandle()
-        notification_enable_handle = notification_handle + 1
-        logger.debug("{action} notifications for device {address}...".format(
-            action="Enabling" if enabled else "Disabling", address=self.addr))
-        self.writeCharacteristic(notification_enable_handle,
-                                 bytes([0x01 if enabled else 0x00, 0x00]),
-                                 withResponse=True)
-        logger.debug("Notifications {action} for device {address}.".format(
-            action="enabled" if enabled else "disabled", address=self.addr))
+        try:
+            notification_handle = self.getCharacteristics(
+                uuid=self.BUTTON_STATUS_CHARACTERISTIC_UUID)[0].getHandle()
+            notification_enable_handle = notification_handle + 1
+            logger.debug("{action} notifications for device {address}..."
+                         .format(action="Enabling" if enabled else "Disabling",
+                                 address=self.addr))
+            self.writeCharacteristic(notification_enable_handle,
+                                     bytes([0x01 if enabled else 0x00, 0x00]),
+                                     withResponse=True)
+            logger.debug("Notifications {action} for device {address}."
+                         .format(action="enabled" if enabled else "disabled",
+                                 address=self.addr))
+        except btle.BTLEException:
+            raise TurnTouchException("Failed to enable notifications for"
+                                     "device {addr}".format(addr=self.addr))
 
     class NotificationDelegate(btle.DefaultDelegate):
         """Handle callbacks for notifications from the device.
