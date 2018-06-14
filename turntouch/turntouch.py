@@ -265,8 +265,12 @@ class TurnTouch(btle.Peripheral):
     @property
     def name(self) -> str:
         """Read the nickname of this remote."""
-        name_bytes = self.getCharacteristics(
-            uuid=self.DEVICE_NAME_CHARACTERISTIC_UUID)[0].read()
+        try:
+            name_bytes = self.getCharacteristics(
+                uuid=self.DEVICE_NAME_CHARACTERISTIC_UUID)[0].read()
+        except btle.BTLEException:
+            raise TurnTouchException("Failed to read name of device {addr}"
+                                     .format(addr=self.addr))
         logger.debug("Read name of device {address}: '{name}'".format(
             address=self.addr, name=name_bytes))
         return name_bytes.decode('utf-8').rstrip('\0')
@@ -280,15 +284,23 @@ class TurnTouch(btle.Peripheral):
         name_characteristic = self.getCharacteristics(
             uuid=self.DEVICE_NAME_CHARACTERISTIC_UUID)[0]
         name_bytes = name.encode('utf-8').ljust(self.DEVICE_NAME_LENGTH, b'\0')
-        name_characteristic.write(name_bytes, withResponse=True)
+        try:
+            name_characteristic.write(name_bytes, withResponse=True)
+        except btle.BTLEException:
+            raise TurnTouchException("Failed to set name of device {addr}"
+                                     .format(addr=self.addr))
         logger.debug("Set name for device {address} to '{name}'".format(
             address=self.addr, name=name_bytes))
 
     @property
     def battery(self) -> int:
         """Read the battery level (percentage) of this remote."""
-        battery_bytes = self.getCharacteristics(
-            uuid=self.BATTERY_LEVEL_CHARACTERISTIC_UUID)[0].read()
+        try:
+            battery_bytes = self.getCharacteristics(
+                uuid=self.BATTERY_LEVEL_CHARACTERISTIC_UUID)[0].read()
+        except btle.BTLEException:
+            raise TurnTouchException("Failed to read battery of device {addr}"
+                                     .format(addr=self.addr))
         logger.debug("Read device {address} battery level: '{battery}'".format(
             address=self.addr, battery=battery_bytes))
         return int.from_bytes(battery_bytes, byteorder='big')
