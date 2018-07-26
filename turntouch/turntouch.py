@@ -1,6 +1,7 @@
 """Classes related to the Turn Touch remote."""
 
 from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 import time
 import logging
 from functools import partial
@@ -262,6 +263,7 @@ class TurnTouch(btle.Peripheral):
         self.debounce = debounce
         self._listening = False
         self._combo_action = set()
+        self._lock = Lock()
         if listen:
             self.listen_forever()
 
@@ -305,11 +307,11 @@ class TurnTouch(btle.Peripheral):
         else:
             return self._read_now(uuid)
 
-
     def _read_now(self, uuid) -> bytes:
         """Read some characteristic from the device."""
         try:
-            read_bytes = self.getCharacteristics(uuid=uuid)[0].read()
+            with self._lock:
+                read_bytes = self.getCharacteristics(uuid=uuid)[0].read()
         except btle.BTLEException:
             raise TurnTouchException("Failed to read device {address} "
                                      "characteristic {uuid}"
@@ -320,13 +322,14 @@ class TurnTouch(btle.Peripheral):
 
     def _write(self, uuid, value_bytes):
         """Write some characteristic to the device."""
-        characteristic = self.getCharacteristics(uuid=uuid)[0]
-        try:
-            characteristic.write(value_bytes, withResponse=True)
-        except btle.BTLEException:
-            raise TurnTouchException("Failed to write device {address} "
-                                     "characteristic {uuid}"
-                                     .format(address=self.addr, uuid=uuid))
+        with self._lock:
+            characteristic = self.getCharacteristics(uuid=uuid)[0]
+            try:
+                characteristic.write(value_bytes, withResponse=True)
+            except btle.BTLEException:
+                raise TurnTouchException("Failed to write device {address} "
+                                         "characteristic {uuid}"
+                                         .format(address=self.addr, uuid=uuid))
         logger.debug("Wrote device {address} characteristic {uuid}: '{value}'"
                      .format(address=self.addr, uuid=uuid, value=value_bytes))
 
@@ -345,10 +348,12 @@ class TurnTouch(btle.Peripheral):
             self.executor = ThreadPoolExecutor(5)
         try:
             if only_one:
-                self.waitForNotifications(0)
+                with self._lock:
+                    self.waitForNotifications(0)
             else:
                 while True:
-                    self.waitForNotifications(self.LISTEN_PERIOD)
+                    with self._lock:
+                        self.waitForNotifications(self.LISTEN_PERIOD)
                     if self._pending_read:
                         while self._read_value:
                             # wait for previously read value to be consumed
@@ -375,16 +380,18 @@ class TurnTouch(btle.Peripheral):
         """Tell the remote to start sending notifications for a particular
         characteristic (uuid)."""
         try:
-            notification_handle = self.getCharacteristics(
-                uuid=uuid)[0].getHandle()
+            with self._lock:
+                notification_handle = self.getCharacteristics(
+                    uuid=uuid)[0].getHandle()
             notification_enable_handle = notification_handle + 1
             logger.debug("{action} notifications for device {address}, "
                          "characteristic {uuid}..."
                          .format(action="Enabling" if enabled else "Disabling",
                                  address=self.addr, uuid=uuid))
-            self.writeCharacteristic(notification_enable_handle,
-                                     bytes([0x01 if enabled else 0x00, 0x00]),
-                                     withResponse=True)
+            with self._lock:
+                self.writeCharacteristic(notification_enable_handle,
+                                         bytes([1 if enabled else 0, 00]),
+                                         withResponse=True)
             logger.debug("Notifications {action} for device {address}, "
                          "characteristic {uuid}"
                          .format(action="enabled" if enabled else "disabled",
